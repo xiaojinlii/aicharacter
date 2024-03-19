@@ -1,0 +1,14 @@
+[Unit]
+Description=AI Character Webui Service
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/ai-character
+Environment="PATH=/root/miniconda3/envs/ai-character/bin"
+ExecStart=/root/miniconda3/envs/ai-character/bin/python -m streamlit run webui.py
+Restart=on-failure
+PIDFile=/var/run/ai-character-webui.pid
+
+[Install]
+WantedBy=multi-user.target

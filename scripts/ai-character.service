@@ -1,0 +1,14 @@
+[Unit]
+Description=AI Character Service
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/ai-character
+Environment="PATH=/root/miniconda3/envs/ai-character/bin"
+ExecStart=/root/miniconda3/envs/ai-character/bin/python main.py run
+Restart=on-failure
+PIDFile=/var/run/ai-character.pid
+
+[Install]
+WantedBy=multi-user.target
