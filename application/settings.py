@@ -11,8 +11,8 @@ DEBUG = False
 
 
 """项目配置"""
-TITLE = "FastAPI Framework"
-DESCRIPTION = "基于FastAPI的Web框架"
+TITLE = "AI Character"
+DESCRIPTION = "基于FastAPI的ai角色对话"
 VERSION = "0.0.1"
 
 
