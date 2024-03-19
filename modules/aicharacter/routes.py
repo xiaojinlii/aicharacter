@@ -1,10 +1,11 @@
 from typing import List
 
-import httpx
+import aiohttp
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.settings import SEARCH_SERVER_URL, SEARCH_KB_NAME, PROMPT_TEMPLATE, MEMORY_PROMPT_TEMPLATE
+from core.exception import CustomException
 from db.dependencies import IdList
 from . import schemas, crud
 from db.database import db_getter
@@ -47,7 +48,14 @@ async def create_characters(
         "knowledge_base_name": get_kb_name(new_character['id']),
         "vector_store_type": "es",
     }
-    httpx.post(url, json=data)
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, json=data) as response:
+            if response.status != 200:
+                raise CustomException(f"Error from create_knowledge_base api response: {await response.text()}")
+            ret = await response.json()
+            if ret["code"] == 400:
+                raise CustomException(ret["message"])
 
     return SuccessResponse(msg="角色创建成功", data=new_character)
 
@@ -61,7 +69,13 @@ async def delete_characters(
 
     url = f"{SEARCH_SERVER_URL}/knowledge_base/delete_knowledge_base"
     for cid in ids.ids:
-        httpx.post(url, json=get_kb_name(cid))
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, json=get_kb_name(cid)) as response:
+                if response.status != 200:
+                    raise CustomException(f"Error from delete_knowledge_base api response: {await response.text()}")
+                ret = await response.json()
+                if ret["code"] == 400:
+                    raise CustomException(ret["message"])
 
     return SuccessResponse(msg="删除成功")
 
@@ -84,7 +98,7 @@ async def chat(
 ):
     character = await crud.CharacterDal(db).get_data(data_id)
 
-    docs = search_docs(query=chat_data.text, knowledge_base_name=get_kb_name(data_id))
+    docs = await search_docs(query=chat_data.text, knowledge_base_name=get_kb_name(data_id))
 
     llm = LangChainGPT(model_name="cyou-api")
 
@@ -101,13 +115,13 @@ async def chat(
 
     # llm.print_prompt()
 
-    response_raw = llm.get_response()
+    response_raw = await llm.get_response_async()
     response = response_postprocess(response_raw)
 
     return SuccessResponse(response)
 
 
-def search_docs(
+async def search_docs(
         query: str = "",
         knowledge_base_name: str = "",
         top_k: int = 3,
@@ -122,9 +136,12 @@ def search_docs(
     }
 
     url = f"{SEARCH_SERVER_URL}/knowledge_base/search_docs"
-    response = httpx.post(url, json=data)
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, json=data) as response:
+            if response.status != 200:
+                raise CustomException(f"Error from search_docs api response: {await response.text()}")
+            ret = await response.json()
 
-    res = response.json()
-    result = [d["page_content"] for d in res]
+    result = [d["page_content"] for d in ret]
     logger.info(f"search_docs:{result}")
     return result

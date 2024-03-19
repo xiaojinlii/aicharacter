@@ -53,6 +53,10 @@ class LangChainGPT:
         response = self.chat.invoke(self.messages)
         return response.content
 
+    async def get_response_async(self):
+        response = await self.chat.ainvoke(self.messages)
+        return response.content
+
     def print_prompt(self):
         for message in self.messages:
             print(message)
