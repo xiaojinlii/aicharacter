@@ -4,6 +4,7 @@ from langchain_core.messages import AIMessage, SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 
 from application.settings import LLM_MODELS_CONFIG
+from .langchain.cyou_chat import ChatCyou
 
 
 def get_ChatOpenAI(
@@ -15,19 +16,30 @@ def get_ChatOpenAI(
         verbose: bool = True,
         **kwargs: Any,
 ) -> ChatOpenAI:
-
-    configs = LLM_MODELS_CONFIG.get("openai-api")
-    model = ChatOpenAI(
-        streaming=streaming,
-        verbose=verbose,
-        callbacks=callbacks,
-        openai_api_key=configs["api_key"],
-        openai_api_base=configs["api_base_url"],
-        model_name=model_name,
-        temperature=temperature,
-        max_tokens=max_tokens,
-        **kwargs
-    )
+    if model_name == "cyou-api":
+        configs = LLM_MODELS_CONFIG.get(model_name)
+        model = ChatCyou(
+            cyou_api_base=configs["server_address"],
+            cyou_api_url=configs["api_url"],
+            cyou_client_id=configs["clientId"],
+            cyou_private_key=configs["privateKey"],
+            temperature=temperature,
+            verbose=verbose,
+            callbacks=callbacks,
+        )
+    else:
+        configs = LLM_MODELS_CONFIG.get("openai-api")
+        model = ChatOpenAI(
+            streaming=streaming,
+            verbose=verbose,
+            callbacks=callbacks,
+            openai_api_key=configs["api_key"],
+            openai_api_base=configs["api_base_url"],
+            model_name=model_name,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            **kwargs
+        )
 
     return model
 
