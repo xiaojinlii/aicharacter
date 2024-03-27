@@ -13,8 +13,10 @@ from io import BytesIO
 
 from httpx._types import QueryParamTypes
 
-from application.configs import HOST, PORT
-from core.logger import logger
+from application.settings import HOST, PORT
+import logging
+
+logger = logging.getLogger(__name__)
 
 HTTPX_DEFAULT_TIMEOUT = 300.0
 
