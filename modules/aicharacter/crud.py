@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.crud import DalBase
+from xiaoapi_sqlalchemy import DalBase
 from . import models, schemas
 
 

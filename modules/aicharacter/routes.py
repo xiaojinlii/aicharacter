@@ -5,15 +5,14 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.settings import SEARCH_SERVER_URL, SEARCH_KB_NAME, PROMPT_TEMPLATE, MEMORY_PROMPT_TEMPLATE
-from core.exception import CustomException
-from db.dependencies import IdList
+from xiaoapi.core import CustomException, logger
+from xiaoapi_sqlalchemy import IdList
 from . import schemas, crud
-from db.database import db_getter
-from utils.response import SuccessResponse
+from xiaoapi_sqlalchemy.database import db_getter
+from xiaoapi.response import SuccessResponse
 from .LangChainGPT import LangChainGPT
 from .utils import add_history, response_postprocess, get_kb_name
 from .dependencies import CharacterParams
-from core.logger import logger
 
 
 router = APIRouter()

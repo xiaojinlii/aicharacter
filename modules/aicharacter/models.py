@@ -1,7 +1,7 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from db.model_base import BaseModel
+from xiaoapi_sqlalchemy.model_base import BaseModel
 
 
 class CharacterModel(BaseModel):
