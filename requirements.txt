@@ -1,4 +1,5 @@
-xiaoapi-sqlalchemy
+xiaoapi>=0.0.3
+xiaoapi-sqlalchemy>=0.0.4
 
 
 # aicharacter
